@@ -1,9 +1,8 @@
 package main
 
 import (
+	"k8s-update-deployment-ecr-tag/webhook/api"
 	"log"
-
-	"github.com/didil/k8s-hello-mutating-webhook/webhook/api"
 )
 
 func main() {

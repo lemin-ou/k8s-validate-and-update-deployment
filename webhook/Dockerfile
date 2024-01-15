@@ -1,5 +1,5 @@
 # Builder Image
-FROM golang:1.15.2 as builder
+FROM golang:1.18 as builder
 
 # create and set working directory
 RUN mkdir -p /app

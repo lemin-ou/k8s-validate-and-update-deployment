@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k8s-update-deployment-ecr-tag-setup
+  namespace: kube-system
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - args:
+        - --service
+        - k8s-update-deployment-ecr-tag
+        - --webhook
+        - k8s-update-deployment-ecr-tag
+        - --secret
+        - k8s-update-deployment-ecr-tag-secret
+        - --namespace
+        - kube-system
+        command:
+        - ./generate_certificate.sh
+        image: quay.io/didil/k8s-webhook-cert-manager:0.13.19-1-a
+        name: k8s-update-deployment-ecr-tag-setup
+      restartPolicy: OnFailure
+      serviceAccountName: k8s-update-deployment-ecr-tag

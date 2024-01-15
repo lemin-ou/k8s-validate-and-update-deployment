@@ -1,8 +1,7 @@
 ## K8s Hello Mutating Webhook
-A Kubernetes Mutating Admission Webhook example, using Go.
-This is a companion repository for the Article [Building a Kubernetes Mutating Admission Webhook: A “magic” way to inject a file into Pod Containers](https://medium.com/@didil/building-a-kubernetes-mutating-admission-webhook-7e48729523ed)
+A Kubernetes Mutating Admission Webhook, using Go.
+This is a companion repository for the Article [Automate ArgoCD deployment update](https://smartmssa.atlassian.net/l/cp/320KJHmm)
 
-This is proof of concept code, make sure to review carefully before using in a production system.
 
 #### Run tests
 ```
@@ -19,10 +18,9 @@ $ export CONTAINER_VERSION=x.y.z
 
 Build/Push Webhook 
 ```
-$ make docker-build
-$ make docker-push
+$ push-image
 ```
-* for this example you'll need to make the container repository public unless you'll be specifying ImagePullSecrets on the Pod
+* for this you'll need to make the container repository public unless you'll be specifying ImagePullSecrets on the Pod
 
 Deploy to K8s cluster
 ```
@@ -39,7 +37,7 @@ $ k exec busybox-1 -it -- sh -c "cat /etc/config/hello.txt"
 # The output should be:
 Hello from the admission controller !
 ```
-We successfully mutated our pod spec and added an arbitary volume/file in there, yay !
+We successfully mutated our pod spec and update the docker image tag using SSM parameter store, yay !
 
 #### Cleanup
 Delete all k8s resources

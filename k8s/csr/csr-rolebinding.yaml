@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: webhook-cert-cluster-role-binding
+  name: k8s-update-deployment-ecr-tag-cluster-role-binding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: webhook-cert-cluster-role
+  name: k8s-update-deployment-ecr-tag-cluster-role
 subjects:
   - kind: ServiceAccount
-    name: webhook-cert-sa
-    namespace: default
+    name: k8s-update-deployment-ecr-tag
+    namespace: kube-system

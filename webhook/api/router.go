@@ -14,7 +14,7 @@ func BuildRouter(app *App) *chi.Mux {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Post("/mutate", app.HandleMutate)
+	r.Post("/", app.HandleMutate)
 
 	return r
 }

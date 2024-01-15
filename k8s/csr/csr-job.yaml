@@ -1,24 +1,25 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: webhook-cert-setup
+  name: k8s-update-deployment-ecr-tag-setup
+  namespace: kube-system
 spec:
   template:
     spec:
-      serviceAccountName: webhook-cert-sa
+      serviceAccountName: k8s-update-deployment-ecr-tag
       containers:
-      - name: webhook-cert-setup
+      - name: k8s-update-deployment-ecr-tag-setup
         # This is a minimal kubectl image based on Alpine Linux that signs certificates using the k8s extension api server
         image: quay.io/didil/k8s-webhook-cert-manager:0.13.19-1-a
         command: ["./generate_certificate.sh"]
         args:
           - "--service"
-          - "hello-webhook-service"
+          - "k8s-update-deployment-ecr-tag"
           - "--webhook"
-          - "hello-webhook.leclouddev.com"
+          - "k8s-update-deployment-ecr-tag"
           - "--secret"
-          - "hello-tls-secret"
+          - "k8s-update-deployment-ecr-tag-secret"
           - "--namespace"
-          - "default"
+          - "kube-system"
       restartPolicy: OnFailure
   backoffLimit: 3

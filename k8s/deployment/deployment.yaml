@@ -1,33 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-webhook-deployment
+  name: k8s-update-deployment-ecr-tag
+  namespace: kube-system
   labels:
-    app: hello-webhook
+    app: k8s-update-deployment-ecr-tag
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-webhook
+      app: k8s-update-deployment-ecr-tag
   template:
     metadata:
       labels:
-        app: hello-webhook
+        app: k8s-update-deployment-ecr-tag
     spec:
       containers:
-      - name: hello-webhook
-        image: CONTAINER_IMAGE
-        ports:
-        - containerPort: 8000
-        volumeMounts:
-        - name: hello-tls-secret
-          mountPath: "/tls"
-          readOnly: true        
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"           
+        - name: k8s-update-deployment-ecr-tag
+          image: CONTAINER_IMAGE
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: k8s-update-deployment-ecr-tag-secret
+              mountPath: "/tls"
+              readOnly: true
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: DEPLOYMENT_NAMESPACE
+              value: release
+            - name: AWS_DEFAULT_REGION
+              value: eu-west-3
+
       volumes:
-      - name: hello-tls-secret
-        secret:
-          secretName: hello-tls-secret
+        - name: k8s-update-deployment-ecr-tag-secret
+          secret:
+            secretName: k8s-update-deployment-ecr-tag-secret
