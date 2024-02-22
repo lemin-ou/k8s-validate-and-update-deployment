@@ -13,7 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr/ecriface"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
 	log "github.com/sirupsen/logrus"
-	"k8s.io/api/admission/v1beta1"
+	v1 "k8s.io/api/admission/v1"
 )
 
 // Errors returned when a validation expectation fails.
@@ -53,7 +53,7 @@ const parameterCode = 407 // ParameterNotFound
 // 7. If a single image didn't meet our requirements, deny the admission
 // 8. All requirements satisfied, allow the Pod for admission
 func (c *Container) Handler() Handler {
-	return func(ctx context.Context, event *http.Request) (*v1beta1.AdmissionReview, error) {
+	return func(ctx context.Context, event *http.Request) (*v1.AdmissionReview, error) {
 		request, err := webhook.NewRequestFromEvent(event) // 1
 		if err != nil {
 			log.Errorf("Error creating request from event: %v", err)

@@ -12,7 +12,7 @@ import (
 	"regexp"
 	"strings"
 
-	v1beta1 "k8s.io/api/admission/v1beta1"
+	v1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -52,7 +52,7 @@ var (
 // Request encapsulates the AdmissionRequest from the
 // AdmissionReview proxied to the Lambda function.
 type Request struct {
-	Admission *v1beta1.AdmissionRequest
+	Admission *v1.AdmissionRequest
 }
 
 // NewRequestFromEvent creates a Request from the APIGatewayProxyRequest.
@@ -66,7 +66,7 @@ func NewRequestFromEvent(event *http.Request) (*Request, error) {
 	}
 	defer event.Body.Close() // close after read
 
-	var review v1beta1.AdmissionReview
+	var review v1.AdmissionReview
 	bytes, err := io.ReadAll(event.Body)
 	if err != nil {
 		return nil, err

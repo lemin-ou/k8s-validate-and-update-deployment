@@ -23,7 +23,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"k8s.io/api/admission/v1beta1"
+	v1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -47,7 +47,7 @@ func (_m *mockECRClient) DescribeImageScanFindingsPagesWithContext(ctx aws.Conte
 }
 
 var s *httptest.Server
-var patchType = v1beta1.PatchTypeJSONPatch
+var patchType = v1.PatchTypeJSONPatch
 
 func TestHandler(t *testing.T) {
 
@@ -60,7 +60,7 @@ func TestHandler(t *testing.T) {
 	}
 
 	type patch struct {
-		patchType *v1beta1.PatchType
+		patchType *v1.PatchType
 		value     []byte
 	}
 
@@ -130,14 +130,14 @@ func TestHandler(t *testing.T) {
 		{
 			name: "ExistingRepositoryWithNoParameterStoreParameter",
 			args: args{
-				image:           "grr-frontend",
+				image:           "test-frontend",
 				shouldCheckVuln: false,
 				repo: &ecr.Repository{
-					RepositoryName:             aws.String("grr-frontend"),
+					RepositoryName:             aws.String("test-frontend"),
 					ImageTagMutability:         aws.String(ecr.ImageTagMutabilityMutable),
 					ImageScanningConfiguration: &ecr.ImageScanningConfiguration{ScanOnPush: aws.Bool(false)},
 				},
-				event: eventWithImage(req, "123456789012.dkr.ecr.region.amazonaws.com/grr-frontend:notlatest"),
+				event: eventWithImage(req, "123456789012.dkr.ecr.region.amazonaws.com/test-frontend:notlatest"),
 			},
 			status:  metav1.StatusFailure,
 			wantErr: true,
@@ -145,19 +145,19 @@ func TestHandler(t *testing.T) {
 		{
 			name: "ExistAndWithSSMParameterStoreParameter",
 			args: args{
-				image:           "gmao-frontend",
+				image:           "test2-frontend",
 				shouldCheckVuln: false,
 				repo: &ecr.Repository{
-					RepositoryName:             aws.String("gmao-frontend"),
+					RepositoryName:             aws.String("test2-frontend"),
 					ImageTagMutability:         aws.String(ecr.ImageTagMutabilityMutable),
 					ImageScanningConfiguration: &ecr.ImageScanningConfiguration{ScanOnPush: aws.Bool(false)},
 				},
-				event: eventWithImage(req, "123456789012.dkr.ecr.region.amazonaws.com/gmao-frontend:notlatest"),
+				event: eventWithImage(req, "123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:notlatest"),
 			},
 			patch: patch{
 				patchType: &patchType,
-				// base64 encoded : '{"op":"replace","path":"/spec/containers/0/image", "value": "123456789012.dkr.ecr.region.amazonaws.com/gmao-frontend:bec0e8f"}'
-				value: []byte("eyJvcCI6InJlcGxhY2UiLCJwYXRoIjoiL3NwZWMvY29udGFpbmVycy8wL2ltYWdlIiwgInZhbHVlIjogIjEyMzQ1Njc4OTAxMi5ka3IuZWNyLnJlZ2lvbi5hbWF6b25hd3MuY29tL2dtYW8tZnJvbnRlbmQ6YmVjMGU4ZiJ9"),
+				// base64 encoded : '{"op":"replace","path":"/spec/containers/0/image", "value": "123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f"}'
+				value: []byte("eyJvcCI6InJlcGxhY2UiLCJwYXRoIjoiL3NwZWMvY29udGFpbmVycy8wL2ltYWdlIiwgInZhbHVlIjogIjEyMzQ1Njc4OTAxMi5ka3IuZWNyLnJlZ2lvbi5hbWF6b25hd3MuY29tL3Rlc3QyLWZyb250ZW5kOmJlYzBlOGYifQ=="),
 			},
 			status:  metav1.StatusSuccess,
 			wantErr: false,
@@ -206,7 +206,7 @@ func TestHandler(t *testing.T) {
 				t.Fatalf("Error during request for image: %v", err)
 			}
 
-			var review v1beta1.AdmissionReview
+			var review v1.AdmissionReview
 
 			buffer, err := io.ReadAll(resp.Body)
 			json.Unmarshal(buffer, &review)

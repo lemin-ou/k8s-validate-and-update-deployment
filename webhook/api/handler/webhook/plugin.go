@@ -6,8 +6,8 @@
 package webhook
 
 import (
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
-	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
+	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	corev1 "k8s.io/api/core/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
@@ -15,6 +15,6 @@ import (
 func init() {
 	// Permissive plugin-or-panic for adding runtime schemas
 	utilruntime.Must(corev1.AddToScheme(runtimeScheme))
-	utilruntime.Must(admissionv1beta1.AddToScheme(runtimeScheme))
-	utilruntime.Must(admissionregistrationv1beta1.AddToScheme(runtimeScheme))
+	utilruntime.Must(admissionv1.AddToScheme(runtimeScheme))
+	utilruntime.Must(admissionregistrationv1.AddToScheme(runtimeScheme))
 }

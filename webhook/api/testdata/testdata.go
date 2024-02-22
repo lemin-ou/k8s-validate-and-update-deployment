@@ -9,7 +9,7 @@ package testdata
 // Referenced: https://github.com/alex-leonhardt/k8s-mutate-webhook/blob/master/pkg/mutate/mutate_test.go
 const ReviewWithOneImage = `{
 	"kind": "AdmissionReview",
-	"apiVersion": "admission.k8s.io/v1beta1",
+	"apiVersion": "admission.k8s.io/v1",
 	"request": {
 		"uid": "e77141b6-6033-11ea-8d6a-0ac25c990f4a",
 		"kind": {
@@ -112,7 +112,7 @@ const ReviewWithOneImage = `{
 // ReviewWithBadRequest is an AdmissionReview with a bad request.
 const ReviewWithBadRequest = `{
 	"kind": "AdmissionReview",
-	"apiVersion": "admission.k8s.io/v1beta1",
+	"apiVersion": "admission.k8s.io/v1",
 	"request": {
 		"uid": "e77141b6-6033-11ea-8d6a-0ac25c990f4a"
 	}
@@ -121,7 +121,7 @@ const ReviewWithBadRequest = `{
 // ReviewWithNoUID is an AdmissionReview with a bad request and no UID.
 const ReviewWithNoUID = `{
 	"kind": "AdmissionReview",
-	"apiVersion": "admission.k8s.io/v1beta1",
+	"apiVersion": "admission.k8s.io/v1",
 	"request": {
 		"uid": ""
 	}
