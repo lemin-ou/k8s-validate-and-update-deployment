@@ -1,5 +1,5 @@
 # Builder Image
-FROM golang:1.18 as builder
+FROM --platform=amd64 golang:1.18 as builder
 
 # create and set working directory
 RUN mkdir -p /app
@@ -15,7 +15,7 @@ ADD . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main main.go
 
 # Final Image
-FROM alpine:3.12
+FROM --platform=amd64 alpine:3.12
 # add ca-certificates
 RUN apk update && apk --no-cache  add ca-certificates
 # set working directory

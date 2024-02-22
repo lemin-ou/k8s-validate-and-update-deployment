@@ -10,13 +10,13 @@ spec:
       containers:
       - name: k8s-update-deployment-ecr-tag-setup
         # This is a minimal kubectl image based on Alpine Linux that signs certificates using the k8s extension api server
-        image: quay.io/didil/k8s-webhook-cert-manager:0.13.19-1-a
+        image: leminou/k8s-webhook-cert-manager:v1.0.1
         command: ["./generate_certificate.sh"]
         args:
           - "--service"
           - "k8s-update-deployment-ecr-tag"
           - "--webhook"
-          - "k8s-update-deployment-ecr-tag"
+          - "k8s-update-deployment-ecr-tag.smartdev.ai"
           - "--secret"
           - "k8s-update-deployment-ecr-tag-secret"
           - "--namespace"

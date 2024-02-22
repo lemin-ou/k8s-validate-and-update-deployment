@@ -15,6 +15,7 @@ spec:
       labels:
         app: k8s-update-deployment-ecr-tag
     spec:
+      serviceAccountName: k8s-update-deployment-ecr-tag
       containers:
         - name: k8s-update-deployment-ecr-tag
           image: CONTAINER_IMAGE
@@ -30,7 +31,7 @@ spec:
               cpu: "500m"
           env:
             - name: DEPLOYMENT_NAMESPACE
-              value: release
+              value: develop
             - name: AWS_DEFAULT_REGION
               value: eu-west-3
 

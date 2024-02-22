@@ -5,9 +5,10 @@ metadata:
   namespace: kube-system
 webhooks:
   - name: "k8s-update-deployment-ecr-tag.smartdev.ai"
+  # this will be removed once deployement of webhook and its components compelete
     objectSelector:
       matchLabels:
-        hello: "true"
+        stop-from-executing: "true"
     rules:
       - apiGroups: [""]
         apiVersions: ["v1"]
@@ -19,6 +20,6 @@ webhooks:
         namespace: "kube-system"
         name: "k8s-update-deployment-ecr-tag"
         path: /
-    admissionReviewVersions: ["v1", "v1beta1"]
+    admissionReviewVersions: ["v1"]
     sideEffects: None
     timeoutSeconds: 10
