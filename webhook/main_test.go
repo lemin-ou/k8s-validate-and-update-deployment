@@ -156,8 +156,8 @@ func TestHandler(t *testing.T) {
 			},
 			patch: patch{
 				patchType: &patchType,
-				// base64 encoded : '{"op":"replace","path":"/spec/containers/0/image", "value": "123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f"}'
-				value: []byte("eyJvcCI6InJlcGxhY2UiLCJwYXRoIjoiL3NwZWMvY29udGFpbmVycy8wL2ltYWdlIiwgInZhbHVlIjogIjEyMzQ1Njc4OTAxMi5ka3IuZWNyLnJlZ2lvbi5hbWF6b25hd3MuY29tL3Rlc3QyLWZyb250ZW5kOmJlYzBlOGYifQ=="),
+				// base64 encoded : '[{"op":"replace","path":"/spec/containers/0/image", "value": "123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f"}]'
+				value: []byte("[{\"op\":\"replace\",\"path\":\"/spec/containers/0/image\", \"value\": \"123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f\"}]"),
 			},
 			status:  metav1.StatusSuccess,
 			wantErr: false,

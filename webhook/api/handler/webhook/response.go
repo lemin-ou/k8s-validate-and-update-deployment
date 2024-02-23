@@ -4,7 +4,6 @@
 package webhook
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 
@@ -18,7 +17,7 @@ var (
 	ErrBadRequest     = errors.New("webhook: bad request")
 )
 
-const patchUpdateImage = `{"op":"replace","path":"/spec/containers/0/image", "value": "%s"}`
+const patchUpdateImage = `[{"op":"replace","path":"/spec/containers/0/image", "value": "%s"}]`
 
 // BadRequestResponse is the response returned to the cluster when a bad request is sent.
 func BadRequestResponse(err error) (*v1.AdmissionReview, error) {
@@ -105,7 +104,7 @@ func encodePatch(image string) []byte {
 	patchBytes := []byte(fmt.Sprintf(patchUpdateImage, image))
 
 	// Create a byte slice to store the base64-encoded result
-	encodedBytes := make([]byte, base64.StdEncoding.EncodedLen(len(patchBytes)))
-	base64.StdEncoding.Encode(encodedBytes, patchBytes)
-	return encodedBytes
+	// encodedBytes := make([]byte, base64.StdEncoding.EncodedLen(len(patchBytes)))
+	// base64.StdEncoding.Encode(encodedBytes, patchBytes)
+	return patchBytes
 }
