@@ -63,6 +63,12 @@ k8s-patch-webhook:
 	@echo "Trying to patch webhook removing objectSelector"; 
 	kubectl patch mutatingwebhookconfiguration "$(WEBHOOK)" --type='json' -p "[{'op': 'remove', 'path': '/webhooks/0/objectSelector'}]"
 
+.PHONY: k8s-patch-webhook-add-objectSelector
+k8s-patch-webhook-add-objectSelector:
+	@echo "Trying to patch webhook adding objectSelector"; 
+	kubectl patch mutatingwebhookconfiguration "$(WEBHOOK)" --type='json' -p '[{"op": "add", "path": "/webhooks/0/objectSelector/matchLabels", "value": {"stop-from-executing": "true"}}]'
+
+
 .PHONY: k8s-delete-all
 k8s-delete-all:
 	kustomize build k8s/other | kubectl delete --ignore-not-found=true -f  -
