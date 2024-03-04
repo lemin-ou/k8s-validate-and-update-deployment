@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: CONTAINER_IMAGE
   newName: 174391158959.dkr.ecr.eu-west-3.amazonaws.com/k8s-update-deployment-ecr-tag
-  newTag: 1.0.6
+  newTag: 1.0.8

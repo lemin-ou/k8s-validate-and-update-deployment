@@ -17,7 +17,7 @@ var (
 	ErrBadRequest     = errors.New("webhook: bad request")
 )
 
-const patchUpdateImage = `[{"op":"replace","path":"/spec/containers/0/image", "value": "%s"}]`
+const patchUpdateImage = `[{"op":"replace","path":"/spec/template/spec/containers/0/image", "value": "%s"}]`
 
 // BadRequestResponse is the response returned to the cluster when a bad request is sent.
 func BadRequestResponse(err error) (*v1.AdmissionReview, error) {
@@ -83,7 +83,7 @@ func (r *Response) PassValidation(image string) *v1.AdmissionReview {
 	}
 	r.Admission.Result = &metav1.Status{
 		Status:  metav1.StatusSuccess,
-		Message: "pod contains compliant ecr repositories and images",
+		Message: "deployment contains compliant ecr repositories and images",
 		Code:    200,
 	}
 	return respond(r.Admission)

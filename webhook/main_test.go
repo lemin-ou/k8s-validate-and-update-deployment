@@ -157,7 +157,7 @@ func TestHandler(t *testing.T) {
 			patch: patch{
 				patchType: &patchType,
 				// base64 encoded : '[{"op":"replace","path":"/spec/containers/0/image", "value": "123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f"}]'
-				value: []byte("[{\"op\":\"replace\",\"path\":\"/spec/containers/0/image\", \"value\": \"123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f\"}]"),
+				value: []byte("[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/image\", \"value\": \"123456789012.dkr.ecr.region.amazonaws.com/test2-frontend:bec0e8f\"}]"),
 			},
 			status:  metav1.StatusSuccess,
 			wantErr: false,

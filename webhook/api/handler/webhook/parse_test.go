@@ -9,55 +9,60 @@ import (
 
 	"k8s-update-deployment-ecr-tag/webhook/api/testdata"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
 func TestParseRepositories(t *testing.T) {
 	var (
-		untaggedImagePod   = newPodWithImage(testdata.UntaggedImage)
-		taggedImagePod     = newPodWithImage(testdata.TaggedImage)
-		cnImagePod         = newPodWithImage(testdata.CNImage)
-		fipsImagePod       = newPodWithImage(testdata.FIPSImage)
-		duplicateImagesPod = newPodWithImage(testdata.TaggedImage)
-		twoImagesPod       = newPodWithImage(testdata.TaggedImage)
-		noNamespacePod     = newPodWithImage(testdata.NoNamespace)
-		aliasedImagePod    = newPodWithImage(testdata.AliasedImage)
-		noImages           = newPodWithImage("")
-		badImage           = newPodWithImage("elgoog/sselortsid")
+		untaggedImageDeployment   = newDeploymentWithImage(testdata.UntaggedImage)
+		taggedImageDeployment     = newDeploymentWithImage(testdata.TaggedImage)
+		cnImageDeployment         = newDeploymentWithImage(testdata.CNImage)
+		fipsImageDeployment       = newDeploymentWithImage(testdata.FIPSImage)
+		duplicateImagesDeployment = newDeploymentWithImage(testdata.TaggedImage)
+		twoImagesDeployment       = newDeploymentWithImage(testdata.TaggedImage)
+		noNamespaceDeployment     = newDeploymentWithImage(testdata.NoNamespace)
+		aliasedImageDeployment    = newDeploymentWithImage(testdata.AliasedImage)
+		noImages                  = newDeploymentWithImage("")
+		badImage                  = newDeploymentWithImage("elgoog/sselortsid")
 	)
-	duplicateImagesPod.Spec.Containers = append(duplicateImagesPod.Spec.Containers, duplicateImagesPod.Spec.Containers...)
-	twoImagesPod.Spec.Containers = append(twoImagesPod.Spec.Containers, untaggedImagePod.Spec.Containers...)
+	duplicateImagesDeployment.Spec.Template.Spec.Containers = append(duplicateImagesDeployment.Spec.Template.Spec.Containers, duplicateImagesDeployment.Spec.Template.Spec.Containers...)
+	twoImagesDeployment.Spec.Template.Spec.Containers = append(twoImagesDeployment.Spec.Template.Spec.Containers, untaggedImageDeployment.Spec.Template.Spec.Containers...)
 	tests := []struct {
-		name string
-		pod  *corev1.Pod
-		want []string
+		name       string
+		deployment *appsv1.Deployment
+		want       []string
 	}{
-		{"UntaggedImage", untaggedImagePod, []string{"namespace/repo@sha256:e5e2a3236e64483c50dd2811e46e9cd49c67e82271e60d112ca69a075fc23005"}},
-		{"TaggedImage", taggedImagePod, []string{"namespace/repo:40d6072"}},
-		{"CNImage", cnImagePod, []string{"namespace/repo:40d6072"}},
-		{"FIPSImage", fipsImagePod, []string{"namespace/repo:40d6072"}},
-		{"Duplicates", duplicateImagesPod, []string{"namespace/repo:40d6072"}},
-		{"TwoImages", twoImagesPod, []string{"namespace/repo:40d6072", "namespace/repo@sha256:e5e2a3236e64483c50dd2811e46e9cd49c67e82271e60d112ca69a075fc23005"}},
-		{"NoNamespace", noNamespacePod, []string{"repo:40d6072"}},
-		{"Aliased", aliasedImagePod, []string{"namespace/repo:40d6072"}},
+		{"UntaggedImage", untaggedImageDeployment, []string{"namespace/repo@sha256:e5e2a3236e64483c50dd2811e46e9cd49c67e82271e60d112ca69a075fc23005"}},
+		{"TaggedImage", taggedImageDeployment, []string{"namespace/repo:40d6072"}},
+		{"CNImage", cnImageDeployment, []string{"namespace/repo:40d6072"}},
+		{"FIPSImage", fipsImageDeployment, []string{"namespace/repo:40d6072"}},
+		{"Duplicates", duplicateImagesDeployment, []string{"namespace/repo:40d6072"}},
+		{"TwoImages", twoImagesDeployment, []string{"namespace/repo:40d6072", "namespace/repo@sha256:e5e2a3236e64483c50dd2811e46e9cd49c67e82271e60d112ca69a075fc23005"}},
+		{"NoNamespace", noNamespaceDeployment, []string{"repo:40d6072"}},
+		{"Aliased", aliasedImageDeployment, []string{"namespace/repo:40d6072"}},
 		{"NoImages", noImages, nil},
 		{"BadImage", badImage, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, got := ParseImages(tt.pod); !reflect.DeepEqual(got, tt.want) {
+			if _, got := ParseImages(tt.deployment); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseRepositories() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func newPodWithImage(image string) *corev1.Pod {
-	return &corev1.Pod{
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Image: image,
+func newDeploymentWithImage(image string) *appsv1.Deployment {
+	return &appsv1.Deployment{
+		Spec: appsv1.DeploymentSpec{
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Image: image,
+						},
+					},
 				},
 			},
 		},

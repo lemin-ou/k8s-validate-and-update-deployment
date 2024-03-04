@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	v1 "k8s.io/api/admission/v1"
-	corev1 "k8s.io/api/core/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -30,7 +30,7 @@ var (
 	ErrInvalidContentType = errors.New("webhook: invalid content type; expected application/json")
 	ErrMissingContentType = errors.New("webhook: missing Content-Type header")
 	ErrObjectNotFound     = errors.New("webhook: request did not include object")
-	ErrUnexpectedResource = errors.New("webhook: expected pod resource")
+	ErrUnexpectedResource = errors.New("webhook: expected deployment resource")
 	ErrInvalidAdmission   = errors.New("webhook: admission request was nil")
 )
 
@@ -42,10 +42,10 @@ var (
 		metav1.NamespaceSystem,
 	}
 	deploymentNamespace = os.Getenv("DEPLOYMENT_NAMESPACE") // TODO: this is the name of the current deployment namespace
-	podDefault          = &schema.GroupVersionKind{
-		Group:   "core",
+	deploymentDefault   = &schema.GroupVersionKind{
+		Group:   "apps",
 		Version: "v1",
-		Kind:    "Pod",
+		Kind:    "Deployment",
 	}
 )
 
@@ -77,31 +77,31 @@ func NewRequestFromEvent(event *http.Request) (*Request, error) {
 	return &Request{Admission: review.Request}, nil
 }
 
-// UnmarshalPod unmarshals the raw object in the AdmissionRequest into a Pod.
-func (r *Request) UnmarshalPod() (*corev1.Pod, error) {
+// UnmarshalDeployment unmarshals the raw object in the AdmissionRequest into a Deployment.
+func (r *Request) UnmarshalDeployment() (*appsv1.Deployment, error) {
 	if r.Admission == nil {
 		return nil, ErrInvalidAdmission
 	}
 	if len(r.Admission.Object.Raw) == 0 {
 		return nil, ErrObjectNotFound
 	}
-	if r.Admission.Kind.Kind != podDefault.Kind {
+	if r.Admission.Kind.Kind != deploymentDefault.Kind {
 		// If the ValidatingWebhookConfiguration was given additional resource scopes.
 		return nil, ErrUnexpectedResource
 	}
 
-	var pod corev1.Pod
-	if err := json.Unmarshal(r.Admission.Object.Raw, &pod); err != nil {
+	var deployment appsv1.Deployment
+	if err := json.Unmarshal(r.Admission.Object.Raw, &deployment); err != nil {
 		return nil, err
 	}
-	return &pod, nil
+	return &deployment, nil
 }
 
 // InCriticalNamespace checks that the request was for a resource
 // that is being deployed into a critical namespace; e.g. kube-system.
-func InCriticalNamespace(pod *corev1.Pod) bool {
+func InCriticalNamespace(deployment *appsv1.Deployment) bool {
 	for _, n := range ignoredNamespaces {
-		if pod.Namespace == n {
+		if deployment.Namespace == n {
 			return true
 		}
 	}
@@ -111,21 +111,17 @@ func InCriticalNamespace(pod *corev1.Pod) bool {
 // NotInDeploymentNamespace checks that the request was for a resource
 // that is being deployed into a non deployment namespace;
 // TODO: This condition may removed later
-func NotInDeploymentNamespace(pod *corev1.Pod) bool {
-	if pod.Namespace != deploymentNamespace {
-		return true
-	}
-
-	return false
+func NotInDeploymentNamespace(deployment *appsv1.Deployment) bool {
+	return deployment.Namespace != deploymentNamespace
 }
 
-// ParseImages returns the container images in the Pod spec
+// ParseImages returns the container images in the Deployment spec
 // that originate from an Amazon ECR repository.
-func ParseImages(pod *corev1.Pod) (string, []string) {
+func ParseImages(deployment *appsv1.Deployment) (string, []string) {
 	var (
 		images     []string
 		registry   string
-		containers = append(pod.Spec.Containers, pod.Spec.InitContainers...)
+		containers = append(deployment.Spec.Template.Spec.Containers, deployment.Spec.Template.Spec.InitContainers...)
 	)
 	for _, c := range containers {
 		if ECRImageRegex.MatchString(c.Image) {

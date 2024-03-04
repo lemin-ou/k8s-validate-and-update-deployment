@@ -19,7 +19,7 @@ import (
 // Errors returned when a validation expectation fails.
 var (
 	ErrFailedCompliance         = errors.New("webhook: repository fails ecr criteria")
-	ErrImagesNotFound           = errors.New("webhook: no ecr images found in pod specification")
+	ErrImagesNotFound           = errors.New("webhook: no ecr images found in deployment specification")
 	ErrMultiImagesNotSuppported = errors.New("webhook: only one ecr image is needed for now !")
 )
 
@@ -44,14 +44,14 @@ const parameterCode = 407 // ParameterNotFound
 // Handler returns the function handler for the amazon-ecr-repository-compliance-webhook.
 // 1. Extract the POST request's body that ValidatingWebhookConfiguration admission controller made to API Gateway
 // 2. Using the request, create a response. The response must contain the same UID that we received from the cluster
-// 3. Using the request, extract the Pod object into the same Go data type used by Kubernetes
-// 4. Using the Pod, check if the requested creation namespace is a critical one (e.g. default).
-// 5. Using the Pod, extract all of the unique container images that are in the specification
+// 3. Using the request, extract the deployment object into the same Go data type used by Kubernetes
+// 4. Using the deployment, check if the requested creation namespace is a critical one (e.g. default).
+// 5. Using the deployment, extract all of the unique container images that are in the specification
 //   - If no images in the specification come from ECR, deny the admission immediately
 //
 // 6. For every image provided, check our 4 requirements
 // 7. If a single image didn't meet our requirements, deny the admission
-// 8. All requirements satisfied, allow the Pod for admission
+// 8. All requirements satisfied, allow the deployment for admission
 func (c *Container) Handler() Handler {
 	return func(ctx context.Context, event *http.Request) (*v1.AdmissionReview, error) {
 		request, err := webhook.NewRequestFromEvent(event) // 1
@@ -66,23 +66,23 @@ func (c *Container) Handler() Handler {
 			return webhook.BadRequestResponse(err)
 		}
 
-		pod, err := request.UnmarshalPod() // 3
+		deployment, err := request.UnmarshalDeployment() // 3
 		if err != nil {
-			log.Errorf("Error unmarshalling Pod: %v", err)
+			log.Errorf("Error unmarshalling Deployment: %v", err)
 			return response.FailValidation(code, err)
 		}
 
-		if webhook.InCriticalNamespace(pod) { // 4
-			log.Info("Pod is in critical namespace, automatically passing")
+		if webhook.InCriticalNamespace(deployment) { // 4
+			log.Info("Deployment is in critical namespace, automatically passing")
 			return response.PassValidation(""), nil
 		}
 
-		if webhook.NotInDeploymentNamespace(pod) { // 5
-			log.Info("Pod is not in the deployment namespaces, automatically passing")
+		if webhook.NotInDeploymentNamespace(deployment) { // 5
+			log.Info("Deployment is not in the deployment namespaces, automatically passing")
 			return response.PassValidation(""), nil
 		}
 
-		registry, images := webhook.ParseImages(pod) // 6
+		registry, images := webhook.ParseImages(deployment) // 6
 		if len(images) == 0 {
 			log.Error(ErrImagesNotFound)
 			return response.FailValidation(code, ErrImagesNotFound)

@@ -10,10 +10,10 @@ webhooks:
       matchLabels:
         stop-from-executing: "true"
     rules:
-      - apiGroups: [""]
+      - apiGroups: ["apps"]
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
-        resources: ["pods"]
+        resources: ["deployments"]
         scope: "Namespaced"
     clientConfig:
       service:
