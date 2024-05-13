@@ -1,10 +1,10 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: "k8s-update-deployment-ecr-tag.smartdev.ai"
+  name: "k8s-update-deployment-ecr-tag.brilliantsolutions.com"
   namespace: kube-system
 webhooks:
-  - name: "k8s-update-deployment-ecr-tag.smartdev.ai"
+  - name: "k8s-update-deployment-ecr-tag.brilliantsolutions.com"
   # this will be removed once deployement of webhook and its components compelete
     objectSelector:
       matchLabels:

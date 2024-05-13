@@ -16,7 +16,7 @@ spec:
           - "--service"
           - "k8s-update-deployment-ecr-tag"
           - "--webhook"
-          - "k8s-update-deployment-ecr-tag.smartdev.ai"
+          - "k8s-update-deployment-ecr-tag.brilliantsolutions.com"
           - "--secret"
           - "k8s-update-deployment-ecr-tag-secret"
           - "--namespace"

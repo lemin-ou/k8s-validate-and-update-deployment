@@ -9,7 +9,7 @@ TEST_CONTAINER_IMAGE_1_TAG=latest
 TEST_CONTAINER_IMAGE_2=test2-frontend
 TEST_CONTAINER_IMAGE_2_TAG=bec0e8f
 TEST_CONTAINER_IMAGE_1_SSM_P=/test2/frontend/ecr_tag
-WEBHOOK=$(WEBHOOK_SERVICE).smartdev.ai
+WEBHOOK=$(WEBHOOK_SERVICE).brilliantsolutions.com
 # DOCKER STUFF
 
 .PHONY: push-image
